@@ -1,22 +1,22 @@
 # Sistema de diseño
 
-CSS propio, sin Tailwind ni librerías de UI.
-
-## Quitar Tailwind del starter kit
-```bash
-npm remove tailwindcss @tailwindcss/vite
-```
-Elimina el plugin de Tailwind de `vite.config.ts` si el starter kit lo trae y no sobrescribas `resources/css/app.css` al copiar el esqueleto.
+CSS propio, sin Tailwind ni librerias de UI. El esqueleto de Laravel trae Tailwind en `package.json`; el README indica como quitarlo.
 
 ## Estructura
-- `tokens.css`: colores (light-dark), tipografía fluida, espaciado, radios.
-- `base.css`: reset y estilos de elementos.
-- `layout.css`: container, section, stack, cluster, grid, header y footer.
-- `components.css`: nav, idioma, btn, card.
-- Capas: `reset, tokens, base, layout, components`.
+- `resources/css/tokens.css`: colores (`light-dark()`), tipografia fluida, espaciado, radios.
+- `resources/css/base.css`: reset y estilos de elementos.
+- `resources/css/layout.css`: container, section, stack, cluster, grid, header y footer.
+- `resources/css/components.css`: skip-link, nav, idioma, btn, card.
+- Capas, en orden: `reset, tokens, base, layout, components`.
+
+## Carga del CSS
+El CSS se carga solo desde `@vite` en `app.blade.php` (entrada `resources/css/app.css`), asi llega como `<link>` en el HTML inicial y no depende de JavaScript.
 
 ## Componentes React
-`Container`, `Section`, `Button` (enlace Inertia o botón), `Card` en `resources/js/components/ui`.
+`Container`, `Section`, `Button` (enlace Inertia o boton) y `Card` en `resources/js/components/ui`.
 
 ## Tema
 Por defecto sigue `prefers-color-scheme`. Fuerza un tema con `data-theme="light|dark"` en `<html>`.
+
+## Compatibilidad
+`light-dark()` requiere navegadores de 2024 o posteriores.

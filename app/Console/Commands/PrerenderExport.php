@@ -19,6 +19,12 @@ class PrerenderExport extends Command
     {
         config(['session.driver' => 'array']);
 
+        $appUrl = rtrim((string) config('app.url'), '/');
+
+        if ($appUrl === '' || str_contains($appUrl, 'localhost')) {
+            $this->warn("APP_URL es '{$appUrl}'. Los canonical y hreflang saldran con ese dominio. Define APP_URL de produccion.");
+        }
+
         $kernel = app(Kernel::class);
         $version = Inertia::getVersion();
         $root = base_path('bootstrap/prerender');
@@ -31,9 +37,9 @@ class PrerenderExport extends Command
 
         foreach (config('locales.supported') as $locale) {
             foreach (config('locales.routes') as $slugs) {
-                $uri = PrerenderGateway::normalize($locale.'/'.$slugs[$locale]);
+                $path = PrerenderGateway::normalize($locale.'/'.$slugs[$locale]);
 
-                $request = Request::create($uri, 'GET', [], [], [], [
+                $request = Request::create($appUrl.$path, 'GET', [], [], [], [
                     'HTTP_X_INERTIA' => 'true',
                     'HTTP_X_INERTIA_VERSION' => $version,
                     'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
@@ -43,7 +49,7 @@ class PrerenderExport extends Command
                 $response = $kernel->handle($request);
 
                 if ($response->getStatusCode() !== 200) {
-                    $this->error("{$uri} devolvio HTTP {$response->getStatusCode()}");
+                    $this->error("{$path} devolvio HTTP {$response->getStatusCode()}");
 
                     return self::FAILURE;
                 }
@@ -51,11 +57,11 @@ class PrerenderExport extends Command
                 $page = json_decode($response->getContent(), true);
 
                 File::put(
-                    $dir.'/'.sha1($uri).'.json',
-                    json_encode(['path' => $uri, 'page' => $page], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    $dir.'/'.sha1($path).'.json',
+                    json_encode(['path' => $path, 'page' => $page], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                 );
 
-                $this->line("OK {$uri}");
+                $this->line("OK {$path}");
                 $count++;
             }
         }

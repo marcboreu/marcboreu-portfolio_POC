@@ -2,6 +2,7 @@
 
 return [
     'brand' => 'Marc Boreu',
+    'skip' => 'Salta al contingut',
     'nav' => ['home' => 'Inici', 'about' => 'Sobre mi', 'projects' => 'Projectes', 'contact' => 'Contacte'],
     'home' => ['title' => 'Marc Boreu | Desenvolupador de programari', 'description' => 'Portfolio de Marc Boreu, desenvolupador de programari a Barcelona: React, TypeScript, Go i Python.', 'h1' => 'Hola, soc en Marc', 'lead' => 'Desenvolupador de programari a Barcelona. Frontend, APIs i pagaments.'],
     'about' => ['title' => 'Sobre mi | Marc Boreu', 'description' => 'Experiència en React, TypeScript, Go, Python, Docker i integracions de pagament.', 'h1' => 'Sobre mi', 'lead' => 'Treballo a Capgemini construint aplicacions web i serveis backend.'],

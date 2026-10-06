@@ -3,11 +3,12 @@
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\SetLocale;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 $locales = config('locales.supported');
 
-Route::get('/', function (\Illuminate\Http\Request $request) use ($locales) {
+Route::get('/', function (Request $request) use ($locales) {
     $locale = $request->getPreferredLanguage($locales) ?? config('locales.default');
 
     return redirect("/{$locale}", 302)->header('Vary', 'Accept-Language');
@@ -26,5 +27,3 @@ Route::middleware(SetLocale::class)->group(function () use ($locales) {
         }
     }
 });
-
-Route::fallback(fn () => redirect('/'.config('locales.default'), 301));

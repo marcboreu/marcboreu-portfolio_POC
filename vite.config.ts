@@ -1,7 +1,7 @@
 import laravel from 'laravel-vite-plugin';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
-import path from 'node:path';
 
 export default defineConfig({
     plugins: [
@@ -12,5 +12,7 @@ export default defineConfig({
         }),
         react(),
     ],
-    resolve: { alias: { '@': path.resolve(__dirname, 'resources/js') } },
+    resolve: {
+        alias: { '@': fileURLToPath(new URL('./resources/js', import.meta.url)) },
+    },
 });

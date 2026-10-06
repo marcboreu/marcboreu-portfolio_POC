@@ -24,12 +24,13 @@ export default function Seo() {
                 <link key={l} head-key={`alt-${l}`} rel="alternate" hrefLang={l} href={alternates[l]} />
             ))}
             <link head-key="alt-x" rel="alternate" hrefLang="x-default" href={alternates['es']} />
+            <meta head-key="og:site_name" property="og:site_name" content={t('brand')} />
             <meta head-key="og:title" property="og:title" content={title} />
             <meta head-key="og:description" property="og:description" content={description} />
             <meta head-key="og:url" property="og:url" content={canonical} />
             <meta head-key="og:type" property="og:type" content="website" />
             <meta head-key="og:locale" property="og:locale" content={ogLocale} />
-            <meta head-key="tw" name="twitter:card" content="summary_large_image" />
+            <meta head-key="tw" name="twitter:card" content="summary" />
             <script head-key="ld" type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         </Head>
     );

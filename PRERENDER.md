@@ -4,35 +4,31 @@ El servidor no ejecuta Node. El HTML de cada pagina se genera en build (tu Mac o
 
 ## Flujo
 1. `vite build` genera los assets del cliente (fija la version de Inertia).
-2. `php artisan prerender:export` pide a Laravel el objeto de pagina de cada ruta e idioma (`bootstrap/prerender/pages`).
+2. `php artisan prerender:export` pide a Laravel el objeto de pagina de cada ruta e idioma, usando `APP_URL` como host (`bootstrap/prerender/pages`).
 3. `vite build --ssr` genera `bootstrap/ssr/ssr.js`, que exporta `render()`.
 4. `node scripts/prerender.mjs` renderiza cada pagina y escribe `bootstrap/prerender/html/*.json` (head + body).
-5. En produccion, `App\Ssr\PrerenderGateway` sustituye al gateway HTTP de Inertia y devuelve ese HTML desde disco. Si falta el fichero o la version de assets no coincide, devuelve `null` y la pagina se renderiza en cliente (sin romper nada).
+5. En produccion, `App\Ssr\PrerenderGateway` sustituye al gateway HTTP de Inertia (`Inertia\Ssr\Gateway`) y devuelve ese HTML desde disco. Si falta el fichero o la version de assets no coincide, devuelve `null` y la pagina se renderiza en cliente.
 
 ## Activacion (una vez)
-1. Anade el provider en `bootstrap/providers.php`:
-   ```php
-   App\Providers\PrerenderServiceProvider::class,
-   ```
-2. En `.env` de produccion: `INERTIA_SSR_ENABLED=true` y `APP_URL=https://marcboreu.com`.
-3. Requisito: Node 20+ y PHP 8.2+ en la maquina de build.
+Provider en `bootstrap/providers.php` y middleware en `bootstrap/app.php` (ver README). En el `.env` de produccion: `APP_URL=https://marcboreu.com`.
 
 ## Build
 ```bash
 APP_URL=https://marcboreu.com bash scripts/build-prerender.sh
 ```
-Sube al servidor el codigo PHP, `public/build` y `bootstrap/prerender`. No hace falta Node en el servidor.
+Requisitos en la maquina de build: Node 22+, PHP 8.2+, Composer y un `.env` con `APP_KEY`. Sube al servidor el codigo PHP, `public/build` y `bootstrap/prerender`. No hace falta Node en el servidor.
 
 ## Comprobar
 ```bash
 curl -s https://marcboreu.com/es | grep -o '<h1[^>]*>[^<]*'
 curl -s https://marcboreu.com/en/projects | grep -o 'hreflang="[a-z-]*"'
+curl -s https://marcboreu.com/es | grep -o 'rel="canonical"[^>]*'
 ```
-Si ves el `<h1>` y los hreflang en la respuesta sin ejecutar JS, el prerender funciona.
+Si ves el `<h1>`, los hreflang y un canonical con tu dominio (no `localhost`) sin ejecutar JS, el prerender funciona.
 
 ## Limites
 - Al cambiar contenido (traducciones, articulos) hay que repetir el build y subir `bootstrap/prerender`.
 - El HTML es estatico: no pongas datos de usuario ni CSRF en props compartidas de las paginas publicas.
-- `APP_URL` debe ser el de produccion al exportar, porque los canonical, hreflang y enlaces salen de `url()`.
-- El 3D (WebGL) debe cargarse solo en cliente (`React.lazy` dentro de `useEffect`) para no romper el render en Node.
-- El gateway y la clase `Response` siguen el contrato de `inertia-laravel` 2.x. Si tu version es 3.x, revisa la firma de `Gateway::dispatch`.
+- El 3D (WebGL) debe cargarse solo en cliente (`WhenMounted` de Inertia v3, o `React.lazy` tras montar) para no romper el render en Node.
+- `Inertia\Ssr\Gateway` y `Inertia\Ssr\Response` existen en `inertia-laravel` y el propio paquete cambia el gateway por un doble en sus tests. La firma exacta de `dispatch()` y el constructor de `Response` no se han podido leer aqui: si PHP se queja al arrancar, compara con `vendor/inertiajs/inertia-laravel/src/Ssr/Gateway.php`.
+- `Inertia::getVersion()` se usa en el comando de exportacion; si no existe en tu version, sustituyelo por la version que devuelve `HandleInertiaRequests::version()`.
