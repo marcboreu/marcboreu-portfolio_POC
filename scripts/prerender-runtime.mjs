@@ -22,13 +22,13 @@ if (!payload.page || typeof payload.page !== 'object') {
 }
 
 const rendered = await renderPage(payload.page);
-const body = typeof rendered === 'string' ? rendered : rendered.body;
+const body = typeof rendered === 'string' ? rendered : String(rendered?.body ?? '');
 
 if (!body || body === '[object Object]' || !body.trim()) {
     throw new Error(`Render HTML inválido en ${pageFile}`);
 }
 
 process.stdout.write(JSON.stringify({
-    head: typeof rendered === 'string' ? [] : rendered.head,
+    head: typeof rendered === 'string' ? [] : rendered.head ?? [],
     body,
 }));
