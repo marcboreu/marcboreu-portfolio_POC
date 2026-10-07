@@ -1,12 +1,1 @@
-{
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build",
-        "build:ssr": "vite build --ssr resources/js/ssr.tsx",
-        "preview": "vite preview",
-        "prerender:dev": "node scripts/prerender-dev.mjs",
-        "prerender:prod": "node scripts/prerender-prod.mjs"
-    }
-}
+{"private":true,"type":"module","scripts":{"dev":"vite","build":"vite build","build:ssr":"vite build --ssr resources/js/ssr.tsx","preview":"vite preview","prerender:dev":"node scripts/prerender-dev.mjs","prerender:prod":"node scripts/prerender-prod.mjs"},"dependencies":{"motion":"^12.23.24"}}
