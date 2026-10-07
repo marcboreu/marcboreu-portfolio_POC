@@ -1,1 +1,24 @@
-{"private":true,"type":"module","scripts":{"dev":"vite","build":"vite build","build:ssr":"vite build --ssr resources/js/ssr.tsx","preview":"vite preview","prerender:dev":"node scripts/prerender-dev.mjs","prerender:prod":"node scripts/prerender-prod.mjs"},"dependencies":{"motion":"^12.23.24"}}
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "build:ssr": "vite build --ssr resources/js/ssr.tsx",
+        "preview": "vite preview",
+        "prerender:dev": "node scripts/prerender-dev.mjs",
+        "prerender:prod": "node scripts/prerender-prod.mjs"
+    },
+    "dependencies": {
+        "@inertiajs/react": "^3.8.0",
+        "motion": "^12.43.0",
+        "react": "^19.3.0",
+        "react-dom": "^19.3.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-react": "^6.1.2",
+        "laravel-vite-plugin": "^3.2.0",
+        "typescript": "^7.0.2",
+        "vite": "^8.3.3"
+    }
+}
