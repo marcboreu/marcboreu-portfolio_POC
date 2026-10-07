@@ -15,19 +15,20 @@ if (!runtimeFile || !pageFile) {
 
 const runtimeUrl = pathToFileURL(path.resolve(root, runtimeFile)).href;
 const { renderPage } = await import(runtimeUrl);
-
-const payload = JSON.parse(
-    await readFile(path.resolve(root, pageFile), 'utf8'),
-);
+const payload = JSON.parse(await readFile(path.resolve(root, pageFile), 'utf8'));
 
 if (!payload.page || typeof payload.page !== 'object') {
     throw new Error(`Page object inválido en ${pageFile}`);
 }
 
-const html = await renderPage(payload.page);
+const rendered = await renderPage(payload.page);
+const body = typeof rendered === 'string' ? rendered : rendered.body;
 
-if (!html || !html.trim()) {
-    throw new Error(`Render vacío en ${pageFile}`);
+if (!body || body === '[object Object]' || !body.trim()) {
+    throw new Error(`Render HTML inválido en ${pageFile}`);
 }
 
-process.stdout.write(html);
+process.stdout.write(JSON.stringify({
+    head: typeof rendered === 'string' ? [] : rendered.head,
+    body,
+}));

@@ -25,16 +25,17 @@ for (const file of await readdir(pagesDir)) {
         input,
     ], { cwd: root, maxBuffer: 10 * 1024 * 1024 });
 
-    const body = stdout.trim();
+    const rendered = JSON.parse(stdout);
+    const body = String(rendered.body ?? '').trim();
 
-    if (!body) {
-        throw new Error(`Render vacío para ${payload.path}`);
+    if (!body || body === '[object Object]') {
+        throw new Error(`Render HTML inválido para ${payload.path}`);
     }
 
     await writeFile(path.join(outDir, file), JSON.stringify({
         path: payload.path,
         version: payload.page.version ?? '',
-        head: [],
+        head: rendered.head ?? [],
         body,
     }, null, 2));
 
