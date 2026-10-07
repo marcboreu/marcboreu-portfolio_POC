@@ -11,6 +11,10 @@ class HandleInertiaRequests extends Middleware
 
     public function version(Request $request): ?string
     {
+        if ($request->header('X-Inertia-Prerender') === 'true') {
+            return null;
+        }
+
         return parent::version($request);
     }
 
@@ -22,7 +26,10 @@ class HandleInertiaRequests extends Middleware
             'locales' => config('locales.supported'),
             'messages' => fn () => __('site'),
             'urls' => fn () => collect(config('locales.routes'))
-                ->map(fn ($slugs) => url('/'.trim(app()->getLocale().'/'.$slugs[app()->getLocale()], '/')))
+                ->map(fn ($slugs) => url('/'.trim(
+                    app()->getLocale().'/'.$slugs[app()->getLocale()],
+                    '/',
+                )))
                 ->all(),
         ];
     }

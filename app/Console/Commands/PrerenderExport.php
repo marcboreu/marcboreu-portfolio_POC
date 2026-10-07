@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Inertia\Inertia;
 
 class PrerenderExport extends Command
 {
@@ -26,7 +25,6 @@ class PrerenderExport extends Command
         }
 
         $kernel = app(Kernel::class);
-        $version = Inertia::getVersion();
         $root = base_path('bootstrap/prerender');
         $dir = $root.'/pages';
 
@@ -41,7 +39,7 @@ class PrerenderExport extends Command
 
                 $request = Request::create($appUrl.$path, 'GET', [], [], [], [
                     'HTTP_X_INERTIA' => 'true',
-                    'HTTP_X_INERTIA_VERSION' => $version,
+                    'HTTP_X_INERTIA_PRERENDER' => 'true',
                     'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
                     'HTTP_ACCEPT' => 'text/html, application/xhtml+xml',
                 ]);
@@ -56,9 +54,15 @@ class PrerenderExport extends Command
 
                 $page = json_decode($response->getContent(), true);
 
+                if (! is_array($page)) {
+                    $this->error("{$path} no devolvio un page object JSON valido");
+
+                    return self::FAILURE;
+                }
+
                 File::put(
                     $dir.'/'.sha1($path).'.json',
-                    json_encode(['path' => $path, 'page' => $page], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                    json_encode(['path' => $path, 'page' => $page], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
                 );
 
                 $this->line("OK {$path}");
@@ -66,7 +70,7 @@ class PrerenderExport extends Command
             }
         }
 
-        $this->info("{$count} paginas exportadas (version {$version})");
+        $this->info("{$count} paginas exportadas");
 
         return self::SUCCESS;
     }
