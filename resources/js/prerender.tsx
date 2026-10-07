@@ -1,23 +1,28 @@
-import { createElement } from 'react';
+import { createInertiaApp } from '@inertiajs/react';
 import { renderToString } from 'react-dom/server';
-import { InertiaApp } from '@inertiajs/react';
 
 const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
 
-export function renderPage(page: any): { head: string[]; body: string } {
-    const pageModule = pages[`./pages/${page.component}.tsx`] as any;
+export async function renderPage(page: any): Promise<{ head: string[]; body: string }> {
+    let rendered: string | undefined;
 
-    if (!pageModule) {
-        throw new Error(`Página Inertia no encontrada: ${page.component}`);
-    }
+    await createInertiaApp({
+        page,
+        render: (element) => {
+            rendered = renderToString(element);
+            return rendered;
+        },
+        resolve: (name) => {
+            const pageModule = pages[`./pages/${name}.tsx`] as any;
 
-    const Component = pageModule.default ?? pageModule;
-    const app = createElement(InertiaApp, {
-        initialPage: page,
-        initialComponent: Component,
-        resolveComponent: () => Component,
-        children: createElement(Component, page.props ?? {}),
+            if (!pageModule) {
+                throw new Error(`Página Inertia no encontrada: ${name}`);
+            }
+
+            return pageModule;
+        },
+        setup: ({ App, props }) => <App {...props} />,
     });
 
-    return { head: [], body: renderToString(app) };
+    return { head: [], body: rendered ?? '' };
 }
