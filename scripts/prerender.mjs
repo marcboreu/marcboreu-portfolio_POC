@@ -1,30 +1,124 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+);
+
 const pagesDir = path.join(root, 'bootstrap/prerender/pages');
 const outDir = path.join(root, 'bootstrap/prerender/html');
+const ssrFile = path.join(root, 'bootstrap/ssr/ssr.js');
 
-const { render } = await import(pathToFileURL(path.join(root, 'bootstrap/ssr/ssr.js')).href);
+const host = '127.0.0.1';
+const port = 13714;
+const baseUrl = `http://${host}:${port}`;
 
-await mkdir(outDir, { recursive: true });
+const server = spawn(process.execPath, [ssrFile], {
+    cwd: root,
+    stdio: ['ignore', 'pipe', 'pipe'],
+});
 
-let count = 0;
+server.stdout.on('data', (data) => {
+    process.stdout.write(`[ssr] ${data}`);
+});
 
-for (const file of await readdir(pagesDir)) {
-    if (!file.endsWith('.json')) continue;
+server.stderr.on('data', (data) => {
+    process.stderr.write(`[ssr] ${data}`);
+});
 
-    const { path: url, page } = JSON.parse(await readFile(path.join(pagesDir, file), 'utf8'));
-    const result = await render(page);
-
-    await writeFile(
-        path.join(outDir, file),
-        JSON.stringify({ path: url, version: page.version ?? null, head: result.head, body: result.body }),
-    );
-
-    console.log(`OK ${url}`);
-    count++;
+function sleep(milliseconds) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, milliseconds);
+    });
 }
 
-console.log(`${count} paginas prerenderizadas`);
+async function waitForServer() {
+    for (let attempt = 0; attempt < 100; attempt++) {
+        try {
+            const response = await fetch(`${baseUrl}/health`);
+
+            if (response.ok) {
+                return;
+            }
+        } catch {
+            // El servidor aún está arrancando.
+        }
+
+        await sleep(100);
+    }
+
+    throw new Error(
+        `El servidor SSR no ha arrancado en ${baseUrl}`,
+    );
+}
+
+async function stopServer() {
+    if (server.exitCode === null) {
+        server.kill('SIGTERM');
+        await sleep(100);
+    }
+}
+
+try {
+    await mkdir(outDir, { recursive: true });
+    await waitForServer();
+
+    let count = 0;
+
+    for (const file of await readdir(pagesDir)) {
+        if (!file.endsWith('.json')) {
+            continue;
+        }
+
+        const payload = JSON.parse(
+            await readFile(path.join(pagesDir, file), 'utf8'),
+        );
+
+        const response = await fetch(`${baseUrl}/render`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify(payload.page),
+        });
+
+        if (!response.ok) {
+            const message = await response.text();
+
+            throw new Error(
+                `SSR falló para ${payload.path}: HTTP ${response.status} ${message}`,
+            );
+        }
+
+        const rendered = await response.json();
+
+        const output = {
+            path: payload.path,
+            version: payload.page.version ?? '',
+            head: rendered.head ?? '',
+            body: rendered.body ?? '',
+        };
+
+        if (!output.body) {
+            throw new Error(
+                `SSR devolvió un body vacío para ${payload.path}`,
+            );
+        }
+
+        await writeFile(
+            path.join(outDir, file),
+            JSON.stringify(output, null, 2),
+        );
+
+        console.log(`OK ${payload.path}`);
+        count++;
+    }
+
+    console.log(`${count} páginas prerenderizadas`);
+} finally {
+    await stopServer();
+}

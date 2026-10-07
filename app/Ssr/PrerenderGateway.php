@@ -9,6 +9,8 @@ class PrerenderGateway implements Gateway
 {
     public function dispatch(array $page): ?Response
     {
+        logger()->debug('Inertia prerender page', $page);
+        
         $file = self::fileFor((string) parse_url($page['url'] ?? '/', PHP_URL_PATH));
 
         if (! is_file($file)) {
