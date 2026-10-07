@@ -11,5 +11,5 @@
   "resources/js/pages/Contact.tsx": [],
   "resources/js/pages/Home.tsx": [],
   "resources/js/pages/Projects.tsx": [],
-  "resources/js/ssr.tsx": []
+  "resources/js/prerender.tsx": []
 }

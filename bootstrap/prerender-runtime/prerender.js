@@ -1,7 +1,6 @@
 import { Head, Link, createInertiaApp, usePage } from "@inertiajs/react";
 import { useEffect } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
-import createServer from "@inertiajs/react/server";
 import { renderToString } from "react-dom/server";
 //#region \0rolldown/runtime.js
 var __defProp = Object.defineProperty;
@@ -277,25 +276,32 @@ function Projects() {
 	})] }) });
 }
 //#endregion
-//#region resources/js/ssr.tsx
+//#region resources/js/prerender.tsx
 var pages = /* #__PURE__ */ Object.assign({
 	"./pages/About.tsx": About_exports,
 	"./pages/Contact.tsx": Contact_exports,
 	"./pages/Home.tsx": Home_exports,
 	"./pages/Projects.tsx": Projects_exports
 });
-var renderPage = (page) => createInertiaApp({
-	page,
-	render: renderToString,
-	resolve: (name) => {
-		const pageModule = pages[`./pages/${name}.tsx`];
-		if (!pageModule) throw new Error(`Página Inertia no encontrada: ${name}`);
-		return pageModule;
-	},
-	setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props })
-});
-createServer(renderPage);
+async function renderPage(page) {
+	let rendered;
+	await createInertiaApp({
+		page,
+		render: (element) => {
+			rendered = renderToString(element);
+			return rendered;
+		},
+		resolve: (name) => {
+			const pageModule = pages[`./pages/${name}.tsx`];
+			if (!pageModule) throw new Error(`Página Inertia no encontrada: ${name}`);
+			return pageModule;
+		},
+		setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props })
+	});
+	return {
+		head: [],
+		body: rendered ?? ""
+	};
+}
 //#endregion
-export { renderPage as default };
-
-//# sourceMappingURL=ssr.js.map
+export { renderPage };
