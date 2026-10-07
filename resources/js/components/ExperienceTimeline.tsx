@@ -8,7 +8,6 @@ type Props = { experiences: Experience[]; labels: { responsibilities: string; ac
 
 function BadgeList({ items }: { items: string[] }) { return <ul className="badge-list" aria-label="Technologies and capabilities">{items.map((item) => <li key={item}><Badge>{item}</Badge></li>)}</ul>; }
 function TextBlocks({ title, items }: { title: string; items: string[] }) { return <div className="experience-card__text-blocks"><p className="experience-card__label">{title}</p>{items.map((item) => <p key={item}>{item}</p>)}</div>; }
-
 function ExperienceDetails({ experience, labels }: { experience: Experience; labels: Props['labels'] }) { return <><p className="experience-card__context">{experience.context}</p><BadgeList items={experience.badges} /><div className="experience-card__content"><TextBlocks title={labels.responsibilities} items={experience.responsibilities} /><TextBlocks title={labels.achievements} items={experience.achievements} /></div><div className="experience-card__projects"><p className="experience-card__label">{labels.projects}</p><div className="experience-card__project-grid">{experience.subprojects.map((project) => <section key={project.title} className="experience-card__project"><h4>{project.title}</h4><p>{project.description}</p><BadgeList items={project.badges} /><div className="experience-card__project-content"><TextBlocks title={labels.responsibilities} items={project.responsibilities} /><TextBlocks title={labels.achievements} items={project.achievements} /></div></section>)}</div></div></>; }
 
 function ExperienceCard({ experience, index, labels, onMoreInfo }: { experience: Experience; index: number; labels: Props['labels']; onMoreInfo: () => void }) {
@@ -34,6 +33,6 @@ export default function ExperienceTimeline({ experiences, labels }: Props) {
     const timelineRef = useRef<HTMLElement | null>(null);
     const reducedMotion = useReducedMotion();
     const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
-    const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 0.75', 'end 0.25'] });
+    const { scrollYProgress } = useScroll({ target: timelineRef, offset: ['start 0.82', 'end 0.18'] });
     const progress = useSpring(scrollYProgress, { stiffness: 70, damping: 32, mass: 0.9 });
     return <><section ref={timelineRef} className="experience-timeline" aria-label="Professional experience"><div className="experience-timeline__line" aria-hidden="true" /><motion.div className="experience-timeline__progress" style={{ scaleY: reducedMotion ? 1 : progress }} aria-hidden="true" />{experiences.map((experience, index) => <ExperienceCard key={`${experience.company}-${experience.period}`} experience={experience} index={index} labels={labels} onMoreInfo={() => setSelectedExperience(experience)} />)}</section>{selectedExperience && <ExperienceModal experience={selectedExperience} labels={labels} onClose={() => setSelectedExperience(null)} />}</>; }
