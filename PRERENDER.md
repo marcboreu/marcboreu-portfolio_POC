@@ -1,23 +1,49 @@
-# Prerender en build (hosting solo PHP)
+# Flujos de desarrollo y producción
 
-El servidor de producción ejecuta únicamente PHP. El HTML público se genera durante el build con Node y React; después se suben `public/build` y `bootstrap/prerender`.
+## Desarrollo local
 
-## Flujo
-1. `php artisan prerender:export` genera los page objects Laravel en `bootstrap/prerender/pages`.
-2. `vite build --ssr resources/js/prerender.tsx --outDir bootstrap/prerender-runtime` genera el renderizador estático.
-3. `node scripts/prerender.mjs` procesa cada page object y escribe `bootstrap/prerender/html/*.json`.
-4. PHP lee `head` y `body` desde disco mediante `PrerenderGateway`.
+Terminal 1:
 
-## Comandos
 ```bash
-npm run build
-npm run build:ssr
-npx vite build --ssr resources/js/prerender.tsx --outDir bootstrap/prerender-runtime
-php artisan optimize:clear
-php artisan prerender:export
-node scripts/prerender.mjs
+php artisan serve
 ```
 
-No se arranca `inertia:start-ssr` en producción y no se necesita Node en el hosting. El renderizador de prerender es independiente del servidor SSR HTTP de Inertia.
+Terminal 2:
 
-`APP_URL` debe ser `https://marcboreu.com` en el build de producción para que canonical y hreflang no apunten a localhost.
+```bash
+npm run dev
+```
+
+Para generar el HTML prerenderizado local:
+
+```bash
+php artisan prerender:export
+npm run prerender:dev
+```
+
+Este comando usa `APP_ENV=local` y `APP_URL=http://localhost:8000` por defecto.
+
+## Build de producción
+
+`npm run build` siempre genera un bundle optimizado de producción. Se puede ejecutar localmente para probarlo, pero no inicia ningún servidor.
+
+Para inspeccionarlo localmente:
+
+```bash
+npm run build
+npm run preview
+```
+
+`npm run preview` es solo una previsualización local; no es un servidor de producción.
+
+## Prerender de producción
+
+```bash
+npm run build
+npx vite build --ssr resources/js/prerender.tsx --outDir bootstrap/prerender-runtime
+php artisan config:cache
+php artisan prerender:export
+APP_URL=https://marcboreu.com npm run prerender:prod
+```
+
+`prerender:prod` exige una URL HTTPS y evita generar accidentalmente enlaces absolutos con localhost.
