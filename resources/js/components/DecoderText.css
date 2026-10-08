@@ -1,0 +1,15 @@
+.decoder-text {
+    display: inline-block;
+    white-space: pre-wrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.decoder-text--decoding {
+    color: var(--decoder-text-color, currentColor);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .decoder-text--decoding {
+        animation: none;
+    }
+}
