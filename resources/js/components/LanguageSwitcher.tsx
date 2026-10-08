@@ -1,5 +1,4 @@
 import { Link } from '@inertiajs/react';
-import { useLocale } from '@/lib/i18n';
 import './LanguageSwitcher.css';
 
 const locales = [
@@ -8,7 +7,14 @@ const locales = [
     { code: 'en', label: 'EN' },
 ] as const;
 
+type Locale = (typeof locales)[number]['code'];
+
+function currentLocale(): Locale {
+    const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
+    return locales.some((locale) => locale.code === firstSegment) ? (firstSegment as Locale) : 'ca';
+}
+
 export default function LanguageSwitcher() {
-    const locale = useLocale();
+    const locale = currentLocale();
     return <nav className="language-switcher" aria-label="Language"><span className="language-switcher__label">{locale.toUpperCase()}</span>{locales.map((item) => <Link key={item.code} href={`/${item.code}`} className={locale === item.code ? 'is-active' : ''} aria-current={locale === item.code ? 'page' : undefined}>{item.label}</Link>)}</nav>;
 }
