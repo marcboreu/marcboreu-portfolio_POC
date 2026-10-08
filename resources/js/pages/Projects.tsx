@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout";
 import Seo from "@/components/Seo";
 import { useT } from "@/lib/i18n";
 import CompanyLogoMarquee from "@/components/CompanyLogoMarquee";
@@ -483,7 +482,7 @@ export default function Projects() {
         close: t("common.close"),
     };
     return (
-        <Layout>
+        <>
             <Seo />
             <main className="projects-page">
                 <section className="projects-hero section">
@@ -518,6 +517,6 @@ export default function Projects() {
                 </section>
                 <CompanyLogoMarquee />
             </main>
-        </Layout>
+        </>
     );
 }

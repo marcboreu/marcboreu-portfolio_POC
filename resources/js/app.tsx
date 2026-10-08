@@ -1,5 +1,4 @@
-import "./bootstrap";
-import "./styles/app.css";
+
 
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
@@ -18,18 +17,19 @@ function PersistentLayoutApp({ App, props }: { App: InertiaApp; props: PageProps
 }
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
+    resolve: async (name) => {
+        const pages = import.meta.glob("./pages/**/*.tsx");
+        const page = await resolvePageComponent(
             `./pages/${name}.tsx`,
-            import.meta.glob("./pages/**/*.tsx"),
-        ),
-    setup({ el, App, props }) {
-        createRoot(el).render(
-            <PersistentLayoutApp App={App} props={props} />,
+            pages,
         );
+
+        page.default.layout ??= (page) => <Layout>{page}</Layout>;
+
+        return page;
     },
-    progress: {
-        color: "#4B5563",
+
+    setup({ el, App, props }) {
+        createRoot(el).render(<App {...props} />);
     },
 });
