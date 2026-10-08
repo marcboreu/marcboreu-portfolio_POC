@@ -1,66 +1,8 @@
-import { Link, usePage } from "@inertiajs/react";
-import { PropsWithChildren, useEffect } from "react";
-import Seo from "@/components/Seo";
-import Container from "@/components/ui/Container";
-import { SharedProps, useT } from "@/lib/i18n";
+import type { ReactNode } from 'react';
+import SoundBar from '@/components/SoundBar';
+import { Link } from '@inertiajs/react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-const KEYS = ["home", "about", "projects", "contact"];
-
-export default function Layout({ children }: PropsWithChildren) {
-    const { urls, locale, locales, alternates, page } =
-        usePage<SharedProps>().props;
-    const t = useT();
-
-    useEffect(() => {
-        document.documentElement.lang = locale;
-    }, [locale]);
-
-    return (
-        <>
-            <Seo />
-            <a className="skip-link" href="#main">
-                {t("skip")}
-            </a>
-            <header className="site-header">
-                <Container className="site-header__inner">
-                    <Link href={urls.home} className="brand">
-                        {t("brand")}
-                    </Link>
-                    <nav className="nav" aria-label="main">
-                        {KEYS.map((k) => (
-                            <Link
-                                key={k}
-                                href={urls[k]}
-                                className="nav__link"
-                                aria-current={page === k ? "page" : undefined}
-                                prefetch
-                            >
-                                {t(`nav.${k}`)}
-                            </Link>
-                        ))}
-                    </nav>
-                    <nav className="lang" aria-label="language">
-                        {locales.map((l) => (
-                            <Link
-                                key={l}
-                                href={alternates[l]}
-                                hrefLang={l}
-                                lang={l}
-                                className="lang__link"
-                                aria-current={l === locale ? "true" : undefined}
-                            >
-                                {l.toUpperCase()}
-                            </Link>
-                        ))}
-                    </nav>
-                </Container>
-            </header>
-            <main id="main">{children}</main>
-            <footer className="site-footer">
-                <Container>
-                    © {new Date().getFullYear()} {t("brand")}
-                </Container>
-            </footer>
-        </>
-    );
+export default function Layout({ children }: { children: ReactNode }) {
+    return <><header className="site-header"><nav className="site-nav"><Link href="/">Home</Link><Link href="/projects">Projects</Link><SoundBar label="Background music" /><LanguageSwitcher /></nav></header>{children}</>;
 }
