@@ -1,63 +1,30 @@
-import "./CompanyLogoMarquee.css";
+import './CompanyLogoMarquee.css';
 
-type Company = { name: string; shortName: string };
+type Company = { name: string; slug: string };
 
 const companies: Company[] = [
-    { name: "Barcelona Activa", shortName: "Barcelona Activa" },
-    { name: "Food Souvenir Barcelona", shortName: "Food Souvenir" },
-    { name: "Interficie Internet Services", shortName: "Interficie" },
-    { name: "MediaMarkt", shortName: "MediaMarkt" },
-    { name: "El Corte Inglés", shortName: "El Corte Inglés" },
-    { name: "Fira de Barcelona", shortName: "Fira Barcelona" },
-    { name: "PortAventura", shortName: "PortAventura" },
-    { name: "Havaianas", shortName: "Havaianas" },
-    { name: "Facilitea", shortName: "Facilitea" },
-    { name: "CaixaBank", shortName: "CaixaBank" },
-    { name: "BBVA", shortName: "BBVA" },
-    { name: "LOEWE", shortName: "LOEWE" },
+    { name: 'Barcelona Activa', slug: 'barcelona-activa' },
+    { name: 'Food Souvenir Barcelona', slug: 'food-souvenir-barcelona' },
+    { name: 'Interficie Internet Services', slug: 'interficie' },
+    { name: 'MediaMarkt', slug: 'mediamarkt' },
+    { name: 'El Corte Inglés', slug: 'el-corte-ingles' },
+    { name: 'Fira de Barcelona', slug: 'fira-barcelona' },
+    { name: 'PortAventura', slug: 'portaventura' },
+    { name: 'Havaianas', slug: 'havaianas' },
+    { name: 'Facilitea', slug: 'facilitea' },
+    { name: 'CaixaBank', slug: 'caixabank' },
+    { name: 'BBVA', slug: 'bbva' },
+    { name: 'LOEWE', slug: 'loewe' },
 ];
 
-const Track = ({ ariaHidden = false }: { ariaHidden?: boolean }) => {
-    return (
-        <div className="company-logo-marquee__track" aria-hidden={ariaHidden}>
-            {companies.map((company) => (
-                <div
-                    className="company-logo-marquee__item"
-                    key={`${ariaHidden ? "duplicate-" : ""}${company.name}`}
-                >
-                    <span
-                        className="company-logo-marquee__mark"
-                        aria-hidden="true"
-                    >
-                        {company.shortName.slice(0, 1)}
-                    </span>
-                    <span>{company.shortName}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
+const logoModules = import.meta.glob('/public/media/companies/*.svg', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
-const CompanyLogoMarquee = () => {
-    return (
-        <section
-            className="company-logo-marquee"
-            aria-labelledby="company-logo-marquee-title"
-        >
-            <div className="company-logo-marquee__inner">
-                <p className="company-logo-marquee__eyebrow">
-                    Experience across brands
-                </p>
-                <h2 id="company-logo-marquee-title">
-                    Companies I have worked with
-                </h2>
-                <div className="company-logo-marquee__viewport">
-                    <Track />
-                    <Track ariaHidden />
-                </div>
-            </div>
-        </section>
-    );
-};
+function logoUrl(slug: string) { return logoModules[`/public/media/companies/${slug}.svg`]; }
 
-export default CompanyLogoMarquee;
+function Track({ ariaHidden = false }: { ariaHidden?: boolean }) {
+    return <div className="company-logo-marquee__track" aria-hidden={ariaHidden}>{companies.map((company) => <div className="company-logo-marquee__item" key={`${ariaHidden ? 'duplicate-' : ''}${company.slug}`}><img className="company-logo-marquee__logo" src={logoUrl(company.slug)} alt={ariaHidden ? '' : company.name} loading="lazy" /><span className="company-logo-marquee__fallback">{company.name}</span></div>)}</div>;
+}
+
+export default function CompanyLogoMarquee() {
+    return <section className="company-logo-marquee" aria-labelledby="company-logo-marquee-title"><div className="company-logo-marquee__inner"><p className="company-logo-marquee__eyebrow">Experience across brands</p><h2 id="company-logo-marquee-title">Companies I have worked with</h2><div className="company-logo-marquee__viewport"><Track /><Track ariaHidden /></div></div></section>;
+}
