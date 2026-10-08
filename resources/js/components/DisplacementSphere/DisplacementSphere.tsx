@@ -1,44 +1,57 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import "./DisplacementSphere.css";
-import { fragmentShader } from "./sphereFragShader";
-import { vertexShader } from "./sphereVertShader";
 
 export type DisplacementSphereProps = {
     className?: string;
     size?: number;
 };
 
-export default function DisplacementSphere({ className = "", size = 560 }: DisplacementSphereProps) {
+export default function DisplacementSphere({
+    className = "",
+    size = 560,
+}: DisplacementSphereProps) {
     const hostRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const host = hostRef.current;
         if (!host || typeof window === "undefined") return;
 
-        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let disposed = false;
+        let frame = 0;
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-        camera.position.z = 3.2;
+        const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+        camera.position.set(0, 0, 4.2);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+        });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setSize(size, size, false);
+        renderer.setClearColor(0x000000, 0);
         host.appendChild(renderer.domElement);
 
-        const geometry = new THREE.SphereGeometry(1, 96, 96);
-        const material = new THREE.ShaderMaterial({
-            vertexShader,
-            fragmentShader,
-            uniforms: {
-                uTime: { value: 0 },
-                uColorA: { value: new THREE.Color("#7c3aed") },
-                uColorB: { value: new THREE.Color("#22d3ee") },
-            },
-            transparent: true,
+        const ambient = new THREE.AmbientLight(0xffffff, 1.4);
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+        keyLight.position.set(-2, 3, 5);
+        scene.add(ambient, keyLight);
+
+        const logo = new THREE.Group();
+        logo.rotation.x = -0.12;
+        scene.add(logo);
+
+        const frontMaterial = new THREE.MeshStandardMaterial({
+            color: 0xf8fafc,
+            metalness: 0.05,
+            roughness: 0.3,
         });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
+        const sideMaterial = new THREE.MeshStandardMaterial({
+            color: 0x94a3b8,
+            metalness: 0.08,
+            roughness: 0.42,
+        });
 
         const resize = () => {
             const width = Math.max(host.clientWidth, 1);
@@ -52,24 +65,74 @@ export default function DisplacementSphere({ className = "", size = 560 }: Displ
         const observer = new ResizeObserver(resize);
         observer.observe(host);
 
-        let frame = 0;
-        const animate = (time: number) => {
-            material.uniforms.uTime.value = reducedMotion ? 0 : time * 0.00035;
-            sphere.rotation.y = reducedMotion ? 0 : time * 0.00008;
-            renderer.render(scene, camera);
-            frame = window.requestAnimationFrame(animate);
-        };
-        frame = window.requestAnimationFrame(animate);
+        const loader = new SVGLoader();
+        loader.load(
+            "/media/logo.svg",
+            (data) => {
+                if (disposed) return;
+
+                const shapes = data.paths.flatMap((path) =>
+                    SVGLoader.createShapes(path),
+                );
+
+                const geometry = new THREE.ExtrudeGeometry(shapes, {
+                    depth: 0.16,
+                    bevelEnabled: true,
+                    bevelThickness: 0.025,
+                    bevelSize: 0.018,
+                    bevelSegments: 3,
+                    curveSegments: 8,
+                });
+
+                geometry.center();
+                geometry.computeVertexNormals();
+
+                const mesh = new THREE.Mesh(geometry, [
+                    frontMaterial,
+                    sideMaterial,
+                ]);
+                mesh.scale.setScalar(0.0082);
+                mesh.rotation.z = Math.PI;
+                logo.add(mesh);
+
+                const animate = (time: number) => {
+                    if (disposed) return;
+                    logo.rotation.y = Math.sin(time * 0.00035) * 0.22;
+                    logo.rotation.x = -0.12 + Math.sin(time * 0.00025) * 0.035;
+                    renderer.render(scene, camera);
+                    frame = window.requestAnimationFrame(animate);
+                };
+
+                frame = window.requestAnimationFrame(animate);
+            },
+            undefined,
+            () => {
+                if (!disposed) renderer.render(scene, camera);
+            },
+        );
 
         return () => {
+            disposed = true;
             window.cancelAnimationFrame(frame);
             observer.disconnect();
-            geometry.dispose();
-            material.dispose();
+            logo.traverse((object) => {
+                if (object instanceof THREE.Mesh) {
+                    object.geometry.dispose();
+                }
+            });
+            frontMaterial.dispose();
+            sideMaterial.dispose();
             renderer.dispose();
             renderer.domElement.remove();
         };
     }, [size]);
 
-    return <div ref={hostRef} className={`displacement-sphere ${className}`} style={{ width: size, height: size }} aria-hidden="true" />;
+    return (
+        <div
+            ref={hostRef}
+            className={`displacement-sphere ${className}`.trim()}
+            style={{ width: size, height: size }}
+            aria-hidden="true"
+        />
+    );
 }
