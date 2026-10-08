@@ -1,35 +1,35 @@
-
-
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
-import type { App as InertiaApp, PageProps } from "@inertiajs/core";
+import type { ComponentType } from "react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import Layout from "@/components/Layout";
 
 const appName = import.meta.env.VITE_APP_NAME || "Portfolio";
 
-function PersistentLayoutApp({ App, props }: { App: InertiaApp; props: PageProps }) {
-    return (
-        <Layout>
-            <App {...props} />
-        </Layout>
-    );
-}
+type PageModule = {
+    default: ComponentType & {
+        layout?: (page: React.ReactNode) => React.ReactNode;
+    };
+};
+
+const pages = import.meta.glob<PageModule>("./pages/**/*.tsx");
 
 createInertiaApp({
-    resolve: async (name) => {
-        const pages = import.meta.glob("./pages/**/*.tsx");
-        const page = await resolvePageComponent(
-            `./pages/${name}.tsx`,
-            pages,
-        );
+    title: (title) => `${title} - ${appName}`,
 
-        page.default.layout ??= (page) => <Layout>{page}</Layout>;
-
-        return page;
-    },
+    resolve: (name) =>
+        resolvePageComponent<PageModule>(`./pages/${name}.tsx`, pages).then(
+            (module) => {
+                module.default.layout ??= (page) => <Layout>{page}</Layout>;
+                return module.default;
+            },
+        ),
 
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
+    },
+
+    progress: {
+        color: "#4B5563",
     },
 });
