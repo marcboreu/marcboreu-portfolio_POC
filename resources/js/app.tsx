@@ -1,20 +1,26 @@
+import "./bootstrap";
+import "./styles/app.css";
+
+import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
-import type { ComponentType } from "react";
-import { createRoot, hydrateRoot } from "react-dom/client";
+import Layout from "@/components/Layout";
+
+const appName = import.meta.env.VITE_APP_NAME || "Portfolio";
 
 createInertiaApp({
+    title: (title) => `${title} - ${appName}`,
     resolve: (name) =>
         resolvePageComponent(
             `./pages/${name}.tsx`,
             import.meta.glob("./pages/**/*.tsx"),
-        ) as Promise<ComponentType<any>>,
+        ),
     setup({ el, App, props }) {
-        if (el.hasChildNodes()) {
-            hydrateRoot(el, <App {...props} />);
-        } else {
-            createRoot(el).render(<App {...props} />);
-        }
+        const root = createRoot(el);
+
+        root.render(<App {...props} />);
     },
-    progress: { color: "#4f46e5" },
+    progress: {
+        color: "#4B5563",
+    },
 });
