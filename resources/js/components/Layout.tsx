@@ -1,13 +1,14 @@
-import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, useEffect } from 'react';
-import Seo from '@/components/Seo';
-import Container from '@/components/ui/Container';
-import { SharedProps, useT } from '@/lib/i18n';
+import { Link, usePage } from "@inertiajs/react";
+import { PropsWithChildren, useEffect } from "react";
+import Seo from "@/components/Seo";
+import Container from "@/components/ui/Container";
+import { SharedProps, useT } from "@/lib/i18n";
 
-const KEYS = ['home', 'about', 'projects', 'contact'];
+const KEYS = ["home", "about", "projects", "contact"];
 
 export default function Layout({ children }: PropsWithChildren) {
-    const { urls, locale, locales, alternates, page } = usePage<SharedProps>().props;
+    const { urls, locale, locales, alternates, page } =
+        usePage<SharedProps>().props;
     const t = useT();
 
     useEffect(() => {
@@ -18,12 +19,12 @@ export default function Layout({ children }: PropsWithChildren) {
         <>
             <Seo />
             <a className="skip-link" href="#main">
-                {t('skip')}
+                {t("skip")}
             </a>
             <header className="site-header">
                 <Container className="site-header__inner">
                     <Link href={urls.home} className="brand">
-                        {t('brand')}
+                        {t("brand")}
                     </Link>
                     <nav className="nav" aria-label="main">
                         {KEYS.map((k) => (
@@ -31,7 +32,7 @@ export default function Layout({ children }: PropsWithChildren) {
                                 key={k}
                                 href={urls[k]}
                                 className="nav__link"
-                                aria-current={page === k ? 'page' : undefined}
+                                aria-current={page === k ? "page" : undefined}
                                 prefetch
                             >
                                 {t(`nav.${k}`)}
@@ -46,7 +47,7 @@ export default function Layout({ children }: PropsWithChildren) {
                                 hrefLang={l}
                                 lang={l}
                                 className="lang__link"
-                                aria-current={l === locale ? 'true' : undefined}
+                                aria-current={l === locale ? "true" : undefined}
                             >
                                 {l.toUpperCase()}
                             </Link>
@@ -57,7 +58,7 @@ export default function Layout({ children }: PropsWithChildren) {
             <main id="main">{children}</main>
             <footer className="site-footer">
                 <Container>
-                    © {new Date().getFullYear()} {t('brand')}
+                    © {new Date().getFullYear()} {t("brand")}
                 </Container>
             </footer>
         </>

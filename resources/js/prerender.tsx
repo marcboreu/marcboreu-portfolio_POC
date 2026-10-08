@@ -1,9 +1,11 @@
-import { createInertiaApp } from '@inertiajs/react';
-import { renderToString } from 'react-dom/server';
+import { createInertiaApp } from "@inertiajs/react";
+import { renderToString } from "react-dom/server";
 
-const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
+const pages = import.meta.glob("./pages/**/*.tsx", { eager: true });
 
-export async function renderPage(page: any): Promise<{ head: string[]; body: string }> {
+export async function renderPage(
+    page: any,
+): Promise<{ head: string[]; body: string }> {
     let rendered: string | undefined;
 
     await createInertiaApp({
@@ -24,5 +26,5 @@ export async function renderPage(page: any): Promise<{ head: string[]; body: str
         setup: ({ App, props }) => <App {...props} />,
     });
 
-    return { head: [], body: rendered ?? '' };
+    return { head: [], body: rendered ?? "" };
 }

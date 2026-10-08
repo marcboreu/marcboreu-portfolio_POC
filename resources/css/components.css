@@ -23,7 +23,11 @@
     }
 
     .project-card--featured .badge {
-        border-color: color-mix(in srgb, var(--color-background) 30%, transparent);
+        border-color: color-mix(
+            in srgb,
+            var(--color-background) 30%,
+            transparent
+        );
         background: color-mix(in srgb, var(--color-background) 8%, transparent);
         color: var(--color-background);
     }

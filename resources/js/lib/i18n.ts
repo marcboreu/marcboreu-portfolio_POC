@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/react';
+import { usePage } from "@inertiajs/react";
 
 export type SharedProps = {
     locale: string;
@@ -14,5 +14,5 @@ export type SharedProps = {
 export function useT() {
     const { messages } = usePage<SharedProps>().props;
     return (key: string): string =>
-        key.split('.').reduce<any>((o, k) => o?.[k], messages) ?? key;
+        key.split(".").reduce<any>((o, k) => o?.[k], messages) ?? key;
 }
