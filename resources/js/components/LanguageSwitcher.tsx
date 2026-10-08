@@ -1,20 +1,30 @@
-import { Link } from '@inertiajs/react';
-import './LanguageSwitcher.css';
+import { Link, usePage } from "@inertiajs/react";
+import "./LanguageSwitcher.css";
 
-const locales = [
-    { code: 'ca', label: 'CA' },
-    { code: 'es', label: 'ES' },
-    { code: 'en', label: 'EN' },
-] as const;
+import type { SharedProps } from "@/lib/i18n";
 
-type Locale = (typeof locales)[number]['code'];
+type Locale = "es" | "ca" | "en";
 
-function currentLocale(): Locale {
-    const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
-    return locales.some((locale) => locale.code === firstSegment) ? (firstSegment as Locale) : 'ca';
-}
+type LanguageProps = Pick<SharedProps, "locale" | "locales" | "alternates">;
 
 export default function LanguageSwitcher() {
-    const locale = currentLocale();
-    return <nav className="language-switcher" aria-label="Language"><span className="language-switcher__label">{locale.toUpperCase()}</span>{locales.map((item) => <Link key={item.code} href={`/${item.code}`} className={locale === item.code ? 'is-active' : ''} aria-current={locale === item.code ? 'page' : undefined}>{item.label}</Link>)}</nav>;
+    const { locale, locales, alternates } = usePage<LanguageProps>().props;
+
+    return (
+        <nav className="language-switcher" aria-label="Language">
+            <span className="language-switcher__label">
+                {locale.toUpperCase()}
+            </span>
+            {locales.map((item: Locale) => (
+                <Link
+                    key={item}
+                    href={alternates[item]}
+                    className={locale === item ? "is-active" : ""}
+                    aria-current={locale === item ? "page" : undefined}
+                >
+                    {item.toUpperCase()}
+                </Link>
+            ))}
+        </nav>
+    );
 }
