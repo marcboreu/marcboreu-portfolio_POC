@@ -21,9 +21,9 @@ export default function Layout({ children }: Props) {
             <header className="site-header">
                 <Container>
                     <SoundBar label="Background music" />
-                    <a className="brand" href={urls.home}>
+                    <Link className="brand" href={urls.home}>
                         {t("brand")}
-                    </a>
+                    </Link>
                     <nav className="nav" aria-label="main">
                         {KEYS.map((key) => (
                             <Link
