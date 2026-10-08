@@ -1,0 +1,37 @@
+.text3d {
+    --text3d-depth: 10px;
+    --text3d-rotate-x: 0deg;
+    --text3d-rotate-y: 0deg;
+    position: relative;
+    display: inline-block;
+    transform: perspective(800px) rotateX(var(--text3d-rotate-x)) rotateY(var(--text3d-rotate-y));
+    transform-style: preserve-3d;
+    transition: transform 180ms ease-out;
+    will-change: transform;
+}
+
+.text3d__face,
+.text3d__shadow {
+    display: block;
+}
+
+.text3d__face {
+    position: relative;
+    z-index: 1;
+    transform: translateZ(var(--text3d-depth));
+}
+
+.text3d__shadow {
+    position: absolute;
+    inset: 0;
+    color: var(--text3d-shadow-color, rgba(124, 58, 237, 0.45));
+    transform: translate3d(calc(var(--text3d-depth) * -0.35), calc(var(--text3d-depth) * 0.35), 0);
+    filter: blur(0.2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .text3d {
+        transform: none;
+        transition: none;
+    }
+}
