@@ -17,7 +17,7 @@ export default function Home() {
                 <div className="home-hero__content">
                     <p className="home-hero__eyebrow">Marc Boreu</p>
                     <h1 className="home-hero__title">
-                        <DecoderText text={t("home.h1")} />
+                        <DecoderText text={"MARC BOREU"} />
                     </h1>
                     <p className="home-hero__lead">
                         <Text3d text={t("home.lead")} depth={6} maxTilt={4} />

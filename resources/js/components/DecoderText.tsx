@@ -4,80 +4,125 @@ import "./DecoderText.css";
 export type DecoderTextProps = {
     text: string;
     className?: string;
-    delay?: number;
+    initialPause?: number;
     revealDelay?: number;
-    characters?: string;
+    binaryChangeDelay?: number;
 };
 
-const DEFAULT_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
+const BINARY_CHARACTERS = "01";
+
+function randomBinary(): string {
+    return BINARY_CHARACTERS[
+        Math.floor(Math.random() * BINARY_CHARACTERS.length)
+    ];
+}
+
+function createBinaryOutput(text: string): string {
+    return Array.from(text, (character) =>
+        character === " " ? " " : randomBinary(),
+    ).join("");
+}
 
 export default function DecoderText({
     text,
     className = "",
-    delay = 0,
-    revealDelay = 34,
-    characters = DEFAULT_CHARACTERS,
+    initialPause = 1000,
+    revealDelay = 300,
+    binaryChangeDelay = 100,
 }: DecoderTextProps) {
-    const [output, setOutput] = useState(text);
+    const [output, setOutput] = useState(() => createBinaryOutput(text));
     const [decoding, setDecoding] = useState(false);
     const runRef = useRef(0);
 
     useEffect(() => {
         const run = ++runRef.current;
-        const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+        const reducedMotion =
+            window.matchMedia?.(
+                "(prefers-reduced-motion: reduce)",
+            ).matches ?? false;
 
-        if (reduceMotion) {
+        if (reducedMotion) {
             setOutput(text);
             setDecoding(false);
             return;
         }
 
-        let startTimer: number | undefined;
         let frame = 0;
-        const startedAt = window.performance.now();
+        let startTimer: number | undefined;
+        let startedAt = 0;
+        let lastBinaryChange = 0;
+        let binaryOutput = createBinaryOutput(text);
 
-        setDecoding(true);
-        setOutput((current) => current.padEnd(text.length, " ").slice(0, text.length));
-
-        const render = () => {
-            if (run !== runRef.current) return;
-            const elapsed = window.performance.now() - startedAt;
-            const progress = Math.max(0, Math.min(1, (elapsed - delay) / Math.max(text.length * revealDelay, 1)));
-            const revealed = Math.floor(progress * text.length);
-            let next = "";
-
-            for (let index = 0; index < text.length; index += 1) {
-                if (index < revealed) {
-                    next += text[index];
-                } else if (text[index] === " ") {
-                    next += " ";
-                } else {
-                    next += characters[Math.floor(Math.random() * characters.length)] ?? "";
-                }
-            }
-
-            setOutput(next);
-
-            if (progress < 1) {
-                frame = window.requestAnimationFrame(render);
-            } else {
-                setOutput(text);
-                setDecoding(false);
-            }
-        };
+        setOutput(binaryOutput);
+        setDecoding(false);
 
         startTimer = window.setTimeout(() => {
+            if (run !== runRef.current) {
+                return;
+            }
+
+            setDecoding(true);
+            startedAt = window.performance.now();
+            lastBinaryChange = startedAt;
+
+            const render = (time: number) => {
+                if (run !== runRef.current) {
+                    return;
+                }
+
+                const elapsed = time - startedAt;
+                const revealedCount = Math.min(
+                    text.length,
+                    Math.floor(elapsed / Math.max(revealDelay, 1)),
+                );
+
+                if (time - lastBinaryChange >= binaryChangeDelay) {
+                    binaryOutput = createBinaryOutput(text);
+                    lastBinaryChange = time;
+                }
+
+                let nextOutput = "";
+
+                for (let index = 0; index < text.length; index += 1) {
+                    if (index < revealedCount) {
+                        nextOutput += text[index];
+                    } else {
+                        nextOutput += binaryOutput[index] ?? " ";
+                    }
+                }
+
+                setOutput(nextOutput);
+
+                if (revealedCount < text.length) {
+                    frame = window.requestAnimationFrame(render);
+                    return;
+                }
+
+                setOutput(text);
+                setDecoding(false);
+            };
+
             frame = window.requestAnimationFrame(render);
-        }, 0);
+        }, initialPause);
 
         return () => {
-            if (startTimer !== undefined) window.clearTimeout(startTimer);
-            if (frame) window.cancelAnimationFrame(frame);
+            if (startTimer !== undefined) {
+                window.clearTimeout(startTimer);
+            }
+
+            if (frame !== 0) {
+                window.cancelAnimationFrame(frame);
+            }
         };
-    }, [text, delay, revealDelay, characters]);
+    }, [text, initialPause, revealDelay, binaryChangeDelay]);
 
     return (
-        <span className={`decoder-text${decoding ? " decoder-text--decoding" : ""} ${className}`.trim()} aria-label={text}>
+        <span
+            className={`decoder-text${
+                decoding ? " decoder-text--decoding" : ""
+            } ${className}`.trim()}
+            aria-label={text}
+        >
             <span aria-hidden="true">{output}</span>
         </span>
     );
