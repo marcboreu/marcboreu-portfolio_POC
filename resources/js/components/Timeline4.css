@@ -1,0 +1,27 @@
+.timeline4 {
+    width: 100%;
+}
+
+.timeline4__list {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.timeline4__item {
+    border: 1px solid currentColor;
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.timeline4__title {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.timeline4__description {
+    margin: 0.35rem 0 0;
+    color: var(--color-muted, #94a3b8);
+}

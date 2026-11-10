@@ -1,0 +1,26 @@
+.timeline3 {
+    width: 100%;
+}
+
+.timeline3__list {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.timeline3__item {
+    border-left: 2px solid currentColor;
+    padding-left: 1.25rem;
+}
+
+.timeline3__title {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.timeline3__description {
+    margin: 0.35rem 0 0;
+    color: var(--color-muted, #94a3b8);
+}
