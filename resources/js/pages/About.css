@@ -1,0 +1,44 @@
+.about-profile {
+    max-width: 48rem;
+}
+
+.about-profile > p:not(.lead),
+.about-card p {
+    color: var(--color-muted, #94a3b8);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1.25rem;
+    margin-top: 2rem;
+}
+
+.about-grid > * {
+    min-width: 0;
+}
+
+.about-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    line-height: 1.35;
+}
+
+.about-card p {
+    margin: 0;
+}
+
+.about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 600px) {
+    .about-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
