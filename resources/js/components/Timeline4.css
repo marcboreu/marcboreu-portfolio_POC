@@ -1,27 +1,197 @@
 .timeline4 {
-    width: 100%;
+  --timeline4-fill: 0;
+  --timeline4-gold: #c49a68;
+  --timeline4-gold-ink: #a7773f;
+  --timeline4-night: #04150c;
+  --timeline4-cream: #f1e3c8;
+  --timeline4-gold-hi: #f6c33a;
+  --timeline4-gutter: clamp(1rem, 3vw, 2.75rem);
+  background: var(--timeline4-night);
+  color: #fff;
+  font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  overflow-x: clip;
+}
+
+.timeline4__pin {
+  position: relative;
+  min-height: 100vh;
+}
+
+.timeline4__svg {
+  display: none;
+}
+
+.timeline4__mobile {
+  padding: 14vh var(--timeline4-gutter) 16vh;
+}
+
+.timeline4__mobile-heading {
+  margin: 0 0 6vh;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: clamp(3rem, 13vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
 }
 
 .timeline4__list {
-    display: grid;
-    gap: 1rem;
-    margin: 0;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline4__list::before,
+.timeline4__list::after {
+  content: '';
+  position: absolute;
+  top: 1.375rem;
+  bottom: 3rem;
+  left: 1.9375rem;
+  width: 2px;
+}
+
+.timeline4__list::before {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.timeline4__list::after {
+  background: #fff;
+  transform: scaleY(var(--timeline4-fill));
+  transform-origin: top;
+}
+
+.timeline4__list-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  align-items: start;
+  gap: 0.875rem;
+  padding-bottom: 1.625rem;
+}
+
+.timeline4__badge {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 2.75rem;
+  border-radius: 1.375rem;
+  background: #fff;
+  color: var(--timeline4-gold-ink);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.timeline4__names {
+  padding-top: 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.timeline4__names span {
+  display: block;
+}
+
+.timeline4__names span + span {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.timeline4__heading {
+  fill: #fff;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 4.625rem;
+  font-weight: 800;
+}
+
+.timeline4__chevron {
+  fill: #fff;
+}
+
+.timeline4__track {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.timeline4__track-ghost {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2;
+  stroke-dasharray: 2 7;
+}
+
+.timeline4__pin-shape {
+  fill: #fff;
+  transition: fill 0.3s ease;
+}
+
+.timeline4__entry:hover .timeline4__pin-shape {
+  fill: #ffe9a8;
+}
+
+.timeline4__year {
+  fill: var(--timeline4-gold-ink);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.90625rem;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.timeline4__label {
+  fill: #fff;
+  font-size: 0.78125rem;
+}
+
+.timeline4__tip-dot {
+  fill: #fff;
+}
+
+.timeline4__tip-glow {
+  fill: url(#timeline4-glow);
+}
+
+@media (min-width: 640px) and (min-height: 300px) and (orientation: landscape) {
+  .timeline4--wide .timeline4__pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .timeline4--wide .timeline4__svg {
+    display: block;
+    position: absolute;
+    top: 6vh;
+    left: 2vw;
+    width: calc(100% - 4vw);
+    height: calc(100% - 13vh);
+    overflow: visible;
+  }
+
+  .timeline4--wide .timeline4__mobile {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
     padding: 0;
-    list-style: none;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
-.timeline4__item {
-    border: 1px solid currentColor;
-    border-radius: 0.75rem;
-    padding: 1rem;
-}
+@media (prefers-reduced-motion: reduce) {
+  .timeline4__list::after {
+    transform: scaleY(1);
+  }
 
-.timeline4__title {
-    margin: 0;
-    font-size: 1.125rem;
-}
-
-.timeline4__description {
-    margin: 0.35rem 0 0;
-    color: var(--color-muted, #94a3b8);
+  .timeline4__pin-shape {
+    transition: none;
+  }
 }
