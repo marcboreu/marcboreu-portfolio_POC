@@ -4,6 +4,24 @@ return [
     'brand' => 'Marc Boreu',
     'skip' => 'Skip to content',
     'nav' => ['home' => 'Home', 'about' => 'About', 'projects' => 'Projects', 'contact' => 'Contact'],
+    'companies' => [
+        'eyebrow' => 'Experience across brands',
+        'title' => 'Companies I have worked with',
+        'logos' => [
+            'barcelona-activa' => 'Barcelona Activa',
+            'food-souvenir-barcelona' => 'Food Souvenir Barcelona',
+            'interficie' => 'Interficie Internet Services',
+            'mediamarkt' => 'MediaMarkt',
+            'el-corte-ingles' => 'El Corte Inglés',
+            'fira-barcelona' => 'Fira de Barcelona',
+            'portaventura' => 'PortAventura',
+            'havaianas' => 'Havaianas',
+            'facilitea' => 'Facilitea',
+            'caixabank' => 'CaixaBank',
+            'bbva' => 'BBVA',
+            'loewe' => 'LOEWE',
+        ],
+    ],
     'home' => [
         'title' => 'Marc Boreu | Software Developer',
         'description' => 'Marc Boreu’s portfolio: software developer in Barcelona working with React, TypeScript, Go and Python.',
@@ -14,7 +32,7 @@ return [
             'lead' => 'Design and development of digital products, interfaces and technical solutions.',
             'items' => [
                 'services.frontend' => ['title' => 'Frontend', 'description' => 'Accessible, maintainable and performance-focused interfaces.'],
-                'services.apis' => ['title' => 'APIs', 'description' => 'Integrations and backend services with clear architectures.'],
+                'services.apis' => ['title' => 'APIs', 'description' => 'Integracions i serveis backend amb arquitectures clares.'],
                 'services.payments' => ['title' => 'Payments', 'description' => 'Payment integrations and eCommerce flows.'],
                 'services.ecommerce' => ['title' => 'eCommerce', 'description' => 'B2C and B2B platforms, catalogues, checkout and operations.'],
                 'services.consulting' => ['title' => 'Consulting', 'description' => 'Frontend architecture, code quality and product improvement.'],

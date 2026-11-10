@@ -1,3 +1,4 @@
+import { useT } from "@/lib/i18n";
 import "./CompanyLogoMarquee.css";
 
 type Company = { name: string; slug: string };
@@ -22,10 +23,14 @@ const logoModules = import.meta.glob("/public/media/companies/*.svg", {
     query: "?url",
     import: "default",
 }) as Record<string, string>;
+
 function logoUrl(slug: string) {
     return logoModules[`/public/media/companies/${slug}.svg`];
 }
+
 function CompanySet() {
+    const t = useT();
+
     return (
         <>
             {companies.map((company) => (
@@ -35,12 +40,14 @@ function CompanySet() {
                         src={logoUrl(company.slug)}
                         alt={company.name}
                         loading="lazy"
+                        title={t(`companies.logos.${company.slug}`)}
                     />
                 </div>
             ))}
         </>
     );
 }
+
 function Track() {
     return (
         <div className="company-logo-marquee__track">
@@ -55,6 +62,8 @@ function Track() {
 }
 
 export default function CompanyLogoMarquee() {
+    const t = useT();
+
     return (
         <section
             className="company-logo-marquee"
@@ -62,10 +71,10 @@ export default function CompanyLogoMarquee() {
         >
             <div className="company-logo-marquee__inner">
                 <p className="company-logo-marquee__eyebrow">
-                    Experience across brands
+                    {t("companies.eyebrow")}
                 </p>
                 <h2 id="company-logo-marquee-title">
-                    Companies I have worked with
+                    {t("companies.title")}
                 </h2>
                 <div className="company-logo-marquee__viewport">
                     <Track />
