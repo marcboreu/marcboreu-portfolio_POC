@@ -1,30 +1,31 @@
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 import './Timeline3.css';
 
-export type Timeline3Item = {
+export type Timeline3Phase = {
   id: string;
-  date: string;
+  phase: string;
   title: string;
   description: string;
-  label?: string;
-  badges?: string[];
+  side?: 'left' | 'right';
+};
+
+export type Timeline3Group = {
+  id: string;
+  label: string;
+  phases: Timeline3Phase[];
 };
 
 type Timeline3Props = {
-  items: Timeline3Item[];
+  groups: Timeline3Group[];
   title?: string;
-  eyebrow?: string;
-  intro?: string;
 };
 
 export default function Timeline3({
-  items,
-  title = 'Timeline',
-  eyebrow,
-  intro,
+  groups,
+  title = 'Sonicboom Process',
 }: Timeline3Props) {
   const rootRef = useRef<HTMLElement | null>(null);
-  const progressRef = useRef<HTMLSpanElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
   const headingId = useId();
   const [progress, setProgress] = useState(0);
 
@@ -45,13 +46,13 @@ export default function Timeline3({
 
     const paint = () => {
       frame = 0;
-      current += (target - current) * 0.16;
+      current += (target - current) * 0.18;
 
       if (Math.abs(target - current) < 0.001) {
         current = target;
       }
 
-      progressElement.style.transform = `scaleY(${current})`;
+      progressElement.style.height = `${current * 100}%`;
       setProgress(current);
 
       if (current !== target) {
@@ -62,7 +63,10 @@ export default function Timeline3({
     const measure = () => {
       const rect = root.getBoundingClientRect();
       const scrollable = rect.height - window.innerHeight;
-      target = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
+      target =
+        scrollable > 0
+          ? Math.max(0, Math.min(1, -rect.top / scrollable))
+          : 0;
 
       if (!frame && !reducedMotion.matches) {
         frame = requestAnimationFrame(paint);
@@ -76,15 +80,13 @@ export default function Timeline3({
         });
       },
       {
-        rootMargin: '0px 0px -18% 0px',
-        threshold: 0.15,
+        rootMargin: '0px 0px -15% 0px',
+        threshold: 0.2,
       },
     );
 
-    const animatedElements = root.querySelectorAll<HTMLElement>(
-      '[data-animate]',
-    );
-    animatedElements.forEach((element) => observer.observe(element));
+    const animatedItems = root.querySelectorAll<HTMLElement>('[data-animate]');
+    animatedItems.forEach((item) => observer.observe(item));
 
     measure();
     window.addEventListener('scroll', measure, { passive: true });
@@ -99,11 +101,13 @@ export default function Timeline3({
       window.removeEventListener('scroll', measure);
       window.removeEventListener('resize', measure);
     };
-  }, [items.length]);
+  }, [groups.length]);
 
-  if (!items.length) {
+  if (!groups.length) {
     return null;
   }
+
+  let phaseIndex = 0;
 
   return (
     <section
@@ -112,83 +116,81 @@ export default function Timeline3({
       aria-labelledby={headingId}
       style={{ '--timeline3-progress': progress } as CSSProperties}
     >
-      <div className="timeline3__inner">
-        <header className="timeline3__header">
-          {eyebrow ? <p className="timeline3__eyebrow">{eyebrow}</p> : null}
-          <h2 id={headingId}>{title}</h2>
-          {intro ? <p className="timeline3__intro">{intro}</p> : null}
-        </header>
+      <div className="timeline3__wrapper">
+        <h2 id={headingId}>{title}</h2>
 
-        <div className="timeline3__wrapper">
-          <div className="timeline3__rail" aria-hidden="true">
-            <span
+        <div className="timeline3">
+          <div className="timeline3__progress" aria-hidden="true">
+            <div
               ref={progressRef}
-              className="timeline3__progress"
+              className="timeline3__progress-fill"
             />
           </div>
 
-          <ol className="timeline3__list">
-            {items.map((item, index) => {
-              const side = index % 2 === 0 ? 'right' : 'left';
-
-              return (
-                <li
-                  key={item.id}
-                  className={`timeline3__item timeline3__item--${side}`}
+          <ul className="timeline3__blocks">
+            {groups.map((group) => (
+              <li
+                key={group.id}
+                className="timeline3__block"
+              >
+                <div
+                  className="timeline3__block-label"
+                  data-animate="label"
+                  aria-hidden="true"
                 >
-                  <div
-                    className="timeline3__circle"
-                    data-animate="circle"
-                    aria-hidden="true"
-                  >
-                    <svg viewBox="0 0 48 48" focusable="false">
-                      <circle
-                        className="timeline3__circle-track"
-                        cx="24"
-                        cy="24"
-                        r="21"
-                      />
-                      <circle
-                        className="timeline3__circle-path"
-                        cx="24"
-                        cy="24"
-                        r="21"
-                        pathLength={100}
-                      />
-                    </svg>
-                  </div>
+                  <span>{group.label}</span>
+                </div>
 
-                  <span
-                    className="timeline3__connector"
-                    data-animate="line"
-                    aria-hidden="true"
-                  />
+                {group.phases.map((phase) => {
+                  phaseIndex += 1;
+                  const side = phase.side ?? (phaseIndex % 2 === 1 ? 'right' : 'left');
 
-                  <article
-                    className="timeline3__content"
-                    data-animate="content"
-                  >
-                    {item.label ? (
-                      <p className="timeline3__label">{item.label}</p>
-                    ) : null}
-                    <p className="timeline3__date">{item.date}</p>
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
+                  return (
+                    <li
+                      key={phase.id}
+                      className={`timeline3__item timeline3__item--${side}`}
+                      data-animate="item"
+                    >
+                      <div className="timeline3__content">
+                        <h3>{phase.title}</h3>
 
-                    {item.badges?.length ? (
-                      <ul className="timeline3__badges">
-                        {item.badges.map((badge, badgeIndex) => (
-                          <li key={`${item.id}-${badge}-${badgeIndex}`}>
-                            {badge}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </article>
-                </li>
-              );
-            })}
-          </ol>
+                        <div className="timeline3__time">
+                          {side === 'left' ? (
+                            <span className="timeline3__line" aria-hidden="true" />
+                          ) : null}
+
+                          <div className="timeline3__circle">
+                            <svg
+                              viewBox="0 0 100 100"
+                              focusable="false"
+                              aria-hidden="true"
+                            >
+                              <circle
+                                className="timeline3__circle-path"
+                                cx="50"
+                                cy="50"
+                                r="49"
+                                pathLength={100}
+                              />
+                            </svg>
+                            <span className="timeline3__phase-text">
+                              {phase.phase}
+                            </span>
+                          </div>
+
+                          {side === 'right' ? (
+                            <span className="timeline3__line" aria-hidden="true" />
+                          ) : null}
+                        </div>
+
+                        <p>{phase.description}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
