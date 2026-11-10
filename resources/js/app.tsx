@@ -1,7 +1,11 @@
+// Client-side rendering entry point
+// - Hydrates initial HTML server-rendered by ssr.tsx
+// - Handles SPA navigation via Inertia links
+// - Uses eager component imports (matching SSR for consistency)
+
 import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import type { ComponentType } from "react";
-import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import Layout from "@/components/Layout";
 
 const appName = import.meta.env.VITE_APP_NAME || "Portfolio";
@@ -12,18 +16,26 @@ type PageModule = {
     };
 };
 
-const pages = import.meta.glob<PageModule>("./pages/**/*.tsx");
+// Use eager imports to match SSR/prerender resolution strategy
+const pages = import.meta.glob<PageModule>("./pages/**/*.tsx", { eager: true });
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
 
-    resolve: (name) =>
-        resolvePageComponent<PageModule>(`./pages/${name}.tsx`, pages).then(
-            (module) => {
-                module.default.layout ??= (page) => <Layout>{page}</Layout>;
-                return module.default;
-            },
-        ),
+    resolve: (name) => {
+        const pageModule = pages[`./pages/${name}.tsx`] as any;
+
+        if (!pageModule) {
+            throw new Error(`Inertia page not found: ${name}`);
+        }
+
+        const module = pageModule.default as ComponentType & {
+            layout?: (page: React.ReactNode) => React.ReactNode;
+        };
+
+        module.layout ??= (page) => <Layout>{page}</Layout>;
+        return module;
+    },
 
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);

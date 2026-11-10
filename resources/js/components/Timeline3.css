@@ -1,7 +1,20 @@
 .timeline3 {
   --timeline3-progress: 0;
-  background: #000;
-  color: #fff;
+  --timeline3-duration: 900ms;
+  --timeline3-easing-default: cubic-bezier(0.22, 1, 0.36, 1);
+  --timeline3-easing-circle: var(--timeline3-easing-default);
+  --timeline3-easing-line: var(--timeline3-easing-default);
+  --timeline3-easing-text: var(--timeline3-easing-default);
+  --timeline3-color-progress: #fff;
+  --timeline3-color-line: #fff;
+  --timeline3-color-circle: #fff;
+  --timeline3-color-text: #fff;
+  --timeline3-color-background: #000;
+  --timeline3-layout-item-spacing: 5rem;
+  --timeline3-layout-circle-size: 6.125rem;
+  --timeline3-layout-content-padding: 7.5rem;
+  background: var(--timeline3-color-background);
+  color: var(--timeline3-color-text);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -13,7 +26,7 @@
 
 .timeline3__wrapper > h2 {
   margin: 0 0 clamp(3rem, 8vw, 6rem);
-  color: #fff;
+  color: var(--timeline3-color-text);
   font-family: Oswald, Inter, system-ui, sans-serif;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 400;
@@ -49,7 +62,7 @@
 .timeline3__progress-fill {
   width: 100%;
   height: calc(var(--timeline3-progress) * 100%);
-  background: #fff;
+  background: var(--timeline3-color-progress);
 }
 
 .timeline3__blocks {
@@ -80,12 +93,12 @@
   align-items: center;
   justify-content: center;
   padding: 0.625rem;
-  border: 1px solid #fff;
+  border: 1px solid var(--timeline3-color-line);
   border-radius: 1.25rem;
-  color: #fff;
+  color: var(--timeline3-color-text);
   opacity: 0;
   transform: translateY(1.875rem);
-  transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity calc(var(--timeline3-duration) * 0.001 * 0.9) ease-out, transform calc(var(--timeline3-duration) * 0.001 * 0.9) var(--timeline3-easing-text);
 }
 
 .timeline3__block-label span {
@@ -108,7 +121,7 @@
 }
 
 .timeline3__item:not(:last-child) {
-  margin-bottom: 5rem;
+  margin-bottom: var(--timeline3-layout-item-spacing);
 }
 
 .timeline3__item--right {
@@ -120,7 +133,7 @@
 }
 
 .timeline3__content {
-  color: #fff;
+  color: var(--timeline3-color-text);
 }
 
 .timeline3__content h3 {
@@ -137,17 +150,17 @@
   line-height: 1.5;
   opacity: 0;
   transform: translateY(1.875rem);
-  transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity calc(var(--timeline3-duration) * 0.001 * 0.9) ease-out, transform calc(var(--timeline3-duration) * 0.001 * 0.9) var(--timeline3-easing-text);
 }
 
 .timeline3__item--right .timeline3__content h3,
 .timeline3__item--right .timeline3__content p {
-  padding-left: 7.5rem;
+  padding-left: var(--timeline3-layout-content-padding);
 }
 
 .timeline3__item--left .timeline3__content h3,
 .timeline3__item--left .timeline3__content p {
-  padding-right: 7.5rem;
+  padding-right: var(--timeline3-layout-content-padding);
 }
 
 .timeline3__time {
@@ -171,8 +184,10 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 6.125rem;
-  height: 6.125rem;
+  width: var(--timeline3-layout-circle-size);
+  height: var(--timeline3-layout-circle-size);
+  z-index: 2;
+  overflow: visible;
 }
 
 .timeline3__circle svg {
@@ -183,46 +198,82 @@
   transform: rotate(-90deg);
 }
 
+.timeline3__circle-radial {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Las líneas están en el mismo viewBox que el aro, así que aplican las mismas posiciones */
+  transform: rotate(-90deg);
+}
+
+.timeline3__circle-radial--right {
+  /* Sin transformación adicional */
+}
+
+.timeline3__circle-radial--left {
+  /* Sin transformación adicional */
+}
+
 .timeline3__circle-path {
   fill: #252525;
-  stroke: #fff;
+  stroke: var(--timeline3-color-circle);
   stroke-width: 1;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  transition: stroke-dashoffset 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+  /* No transition aquí - controlado dinámicamente por JS */
 }
 
 .timeline3__phase-text {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   font-size: 0.875rem;
 }
 
 .timeline3__line {
-  display: block;
-  width: calc(100% - 6.125rem);
-  height: 1px;
-  background: #fff;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 1.5s cubic-bezier(0.33, 1, 0.68, 1);
+  position: relative;
+  width: calc(100% - var(--timeline3-layout-circle-size));
+  height: 2px;
+  background: transparent;
+  z-index: 1;
 }
 
-.timeline3__item--left .timeline3__line {
-  transform-origin: right;
-  background: linear-gradient(270deg, #fff, rgba(255, 255, 255, 0));
+.timeline3__line svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-.timeline3__item--right .timeline3__line {
-  background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0));
+.timeline3__line-path {
+  stroke: var(--timeline3-color-line);
+  stroke-width: 2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  fill: none;
+  /* No transition aquí - controlado dinámicamente por JS */
+}
+
+.timeline3__radial-line {
+  stroke: var(--timeline3-color-line);
+  stroke-width: 2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  fill: none;
+  /* No transition aquí - controlado dinámicamente por JS */
 }
 
 .timeline3__item[data-visible] .timeline3__circle-path {
   stroke-dashoffset: 0;
 }
 
-.timeline3__item[data-visible] .timeline3__line {
-  transform: scaleX(1);
+.timeline3__item[data-visible] .timeline3__line-path {
+  stroke-dashoffset: 0;
+}
+
+.timeline3__item[data-visible] .timeline3__radial-line {
+  stroke-dashoffset: 0;
 }
 
 .timeline3__item[data-visible] .timeline3__content p {

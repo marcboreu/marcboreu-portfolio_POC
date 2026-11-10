@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 import SoundBar from "@/components/SoundBar";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Container from "@/components/ui/Container";
+import SchemaPage from "@/components/SchemaPage";
 import { SharedProps, useT } from "@/lib/i18n";
 
 const KEYS = ["home", "about", "projects", "contact"] as const;
@@ -10,11 +11,21 @@ const KEYS = ["home", "about", "projects", "contact"] as const;
 type Props = PropsWithChildren;
 
 export default function Layout({ children }: Props) {
-    const { urls, page } = usePage<SharedProps>().props;
+    const { urls, page, breadcrumbs, pageTitle, pageDescription } =
+        usePage<SharedProps>().props;
     const t = useT();
+
+    const title = pageTitle || t(`${page}.title`);
+    const description = pageDescription || t(`${page}.description`);
 
     return (
         <>
+            <SchemaPage
+                page={page as "home" | "about" | "projects" | "contact"}
+                breadcrumbs={breadcrumbs}
+                title={title}
+                description={description}
+            />
             <a className="skip-link" href="#main">
                 {t("skip")}
             </a>

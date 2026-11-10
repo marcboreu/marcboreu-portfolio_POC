@@ -291,6 +291,53 @@ El runtime está desactualizado o se está serializando el resultado completo en
 
 Comprueba `APP_URL`, limpia la configuración cacheada, vuelve a exportar los page objects y ejecuta `npm run prerender:prod` con una URL HTTPS.
 
+## SEO Optimization
+
+The portfolio includes comprehensive SEO features to maximize search engine visibility:
+
+### Features
+
+- **Dynamic XML Sitemaps**: Multi-language sitemaps (es, ca, en) automatically generated on build
+- **Robots.txt**: Search engine crawler directives and rate limiting
+- **JSON-LD Schemas**: Organization, Person, WebSite, and BreadcrumbList structured data
+- **Meta Tags**: Complete Open Graph, Twitter Card, and Apple meta tags
+- **Resource Hints**: DNS-prefetch, preconnect for performance optimization
+- **Favicon Package**: Multiple icon formats for browsers and PWA
+- **Web App Manifest**: Progressive Web App support
+
+### Configuration
+
+SEO settings are managed in:
+- `config/seo.php` - Organization and person information
+- `config/schemas.php` - Structured data templates
+- `.env` - Environment-specific variables (APP_URL, OG_IMAGE, etc.)
+
+### Build Integration
+
+Sitemaps are automatically generated during the build process:
+
+```bash
+npm run build
+# Sitemaps generated to public/sitemap*.xml
+```
+
+### Key Files
+
+- [RENDERING_ARCHITECTURE.md](./RENDERING_ARCHITECTURE.md) - Complete SEO integration details
+- [SEO_SETUP.md](./SEO_SETUP.md) - Maintenance and configuration guide
+- [SEO_TESTING_GUIDE.md](./openspec/changes/enhanced-seo-optimization/SEO_TESTING_GUIDE.md) - Validation procedures
+
+### Maintenance
+
+When adding new pages or updating content:
+
+1. Update `config/locales.php` with new routes
+2. Create the page component in `resources/js/pages/`
+3. Add sitemap priority in `config/seo.php`
+4. Run `npm run build` to regenerate sitemaps
+
+For detailed instructions, see [SEO_SETUP.md](./SEO_SETUP.md).
+
 ## Seguridad
 
 - No publiques `.env`.

@@ -1,3 +1,9 @@
+// Server-side rendering entry point (Node.js)
+// - Renders React components to HTML string
+// - Called by Laravel during HTTP requests
+// - Returns initial HTML with Inertia props for hydration
+// - Uses eager component imports for Node.js execution
+
 import { createInertiaApp } from "@inertiajs/react";
 import createServer from "@inertiajs/react/server";
 import { renderToString } from "react-dom/server";
@@ -14,7 +20,7 @@ createServer((page) =>
             const pageModule = pages[`./pages/${name}.tsx`] as any;
 
             if (!pageModule) {
-                throw new Error(`Página Inertia no encontrada: ${name}`);
+                throw new Error(`Inertia page not found: ${name}`);
             }
 
             return pageModule;

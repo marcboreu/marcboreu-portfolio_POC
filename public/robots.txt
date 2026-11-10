@@ -1,4 +1,21 @@
+# robots.txt - Search Engine Crawl Optimization
+# For: marcboreu.com
+# Generated: 2026-11-10
+
+# Allow all crawlers to access the site
 User-agent: *
 Allow: /
 
+# Disallow paths that shouldn't be indexed
+Disallow: /admin/
+Disallow: /api/
+Disallow: /storage/
+Disallow: /*.json$
+Disallow: /search/
+
+# Rate limiting for aggressive crawlers
+Crawl-delay: 1
+Request-rate: 10/m
+
+# Sitemap reference
 Sitemap: https://marcboreu.com/sitemap.xml

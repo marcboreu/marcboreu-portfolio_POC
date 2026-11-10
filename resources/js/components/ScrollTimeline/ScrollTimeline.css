@@ -1,0 +1,515 @@
+/**
+ * ScrollTimeline Component - Main Stylesheet
+ * Vanilla CSS with responsive design and GPU acceleration
+ * No preprocessor dependencies (Tailwind, SASS, etc.)
+ */
+
+/* ===========================
+   CONTAINER & LAYOUT
+   =========================== */
+
+.timeline-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+
+    /* Performance optimization */
+    contain: layout paint;
+    will-change: scroll-position;
+
+    /* Smooth scrolling */
+    -webkit-overflow-scrolling: touch;
+}
+
+.timeline-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.timeline-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* ===========================
+   SPINE (VERTICAL LINE)
+   =========================== */
+
+.timeline-spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100px; /* Will be updated by component */
+    background: linear-gradient(to bottom, #333, #999);
+
+    /* Smooth transitions */
+    transition:
+        height 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        box-shadow 0.3s ease-out;
+
+    /* Performance */
+    will-change: height;
+    z-index: 10;
+}
+
+/* Glow effect on fast scroll */
+.timeline-spine.active {
+    box-shadow: 0 0 15px rgba(51, 51, 51, 0.3);
+}
+
+/* ===========================
+   EVENTS CONTAINER
+   =========================== */
+
+.timeline-events {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20vh 0;
+    z-index: 5;
+}
+
+/* ===========================
+   INDIVIDUAL EVENT
+   =========================== */
+
+.timeline-event {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin: 80px 0;
+
+    /* Performance */
+    will-change: transform, opacity;
+    contain: layout paint style;
+}
+
+/* Event positioned on left side */
+.timeline-event.left {
+    justify-content: flex-end;
+    padding-right: calc(50% + 60px);
+}
+
+/* Event positioned on right side */
+.timeline-event.right {
+    justify-content: flex-start;
+    padding-left: calc(50% + 60px);
+}
+
+/* ===========================
+   EVENT MARKER (CIRCLE DOT)
+   =========================== */
+
+.timeline-marker {
+    position: absolute;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: #333;
+    border: 3px solid white;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    z-index: 20;
+
+    /* Smooth animations */
+    transition:
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.3s ease-out,
+        border-color 0.3s ease-out;
+
+    /* Performance */
+    will-change: transform, box-shadow;
+
+    /* Focus styles */
+    outline: none;
+}
+
+/* Marker scale states */
+.timeline-marker.visible {
+    transform: translateX(-50%) scale(1.2);
+    box-shadow: 0 0 8px rgba(51, 51, 51, 0.3);
+}
+
+.timeline-marker:hover {
+    transform: translateX(-50%) scale(1.5);
+    box-shadow: 0 0 12px rgba(51, 51, 51, 0.5);
+    border-color: #333;
+}
+
+.timeline-marker:focus {
+    outline: 2px solid #333;
+    outline-offset: 4px;
+}
+
+.timeline-marker:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.timeline-marker:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: 4px;
+}
+
+/* Pulse animation state */
+.timeline-marker.pulse {
+    animation: pulse-marker 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ===========================
+   EVENT CONTENT
+   =========================== */
+
+.timeline-content {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    /* Animations */
+    transition:
+        opacity 0.4s ease-out,
+        transform 0.4s ease-out;
+    will-change: opacity, transform;
+
+    /* Performance */
+    contain: layout paint;
+}
+
+.timeline-content.hidden {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ===========================
+   EVENT CONTENT PARTS
+   =========================== */
+
+.timeline-year {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.timeline-number {
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+    color: #333;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+.timeline-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.timeline-description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* ===========================
+   ANIMATIONS & KEYFRAMES
+   =========================== */
+
+/* Pulse animation for markers */
+@keyframes pulse-marker {
+    0% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 0 0 0 rgba(51, 51, 51, 0.4);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.3);
+        box-shadow: 0 0 0 8px rgba(51, 51, 51, 0);
+    }
+    100% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 0 0 0 rgba(51, 51, 51, 0);
+    }
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Slide in from right */
+@keyframes slide-in-right {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ===========================
+   RESPONSIVE DESIGN
+   =========================== */
+
+/* Tablet: 768px - 1024px */
+@media (max-width: 1024px) {
+    .timeline-event.left {
+        padding-right: calc(50% + 40px);
+    }
+
+    .timeline-event.right {
+        padding-left: calc(50% + 40px);
+    }
+
+    .timeline-marker {
+        width: 10px;
+        height: 10px;
+        border-width: 2px;
+    }
+
+    .timeline-content {
+        max-width: 280px;
+        padding: 16px;
+    }
+
+    .timeline-title {
+        font-size: 16px;
+    }
+
+    .timeline-number {
+        font-size: 28px;
+    }
+}
+
+/* Mobile: < 768px */
+@media (max-width: 768px) {
+    /* Switch to single column layout */
+    .timeline-event,
+    .timeline-event.left,
+    .timeline-event.right {
+        justify-content: flex-start;
+        padding-left: 40px !important;
+        padding-right: 0 !important;
+        margin: 60px 0;
+    }
+
+    /* Spine hidden/minimal on mobile */
+    .timeline-spine {
+        left: 20px;
+        width: 2px;
+        top: 0;
+        height: auto;
+    }
+
+    /* Marker positioned at spine */
+    .timeline-marker {
+        left: 20px;
+    }
+
+    /* Content full width */
+    .timeline-content {
+        max-width: calc(100% - 60px);
+        margin-left: 20px;
+        padding: 16px;
+    }
+
+    .timeline-title {
+        font-size: 16px;
+    }
+
+    .timeline-number {
+        font-size: 24px;
+    }
+
+    .timeline-year {
+        font-size: 10px;
+    }
+
+    .timeline-description {
+        font-size: 13px;
+        -webkit-line-clamp: 2;
+    }
+}
+
+/* Small mobile: < 480px */
+@media (max-width: 480px) {
+    .timeline-event,
+    .timeline-event.left,
+    .timeline-event.right {
+        padding-left: 36px !important;
+        margin: 50px 0;
+    }
+
+    .timeline-spine {
+        left: 18px;
+    }
+
+    .timeline-marker {
+        left: 18px;
+        width: 10px;
+        height: 10px;
+        border-width: 2px;
+    }
+
+    .timeline-content {
+        max-width: calc(100% - 50px);
+        margin-left: 0;
+        padding: 12px;
+    }
+
+    .timeline-title {
+        font-size: 14px;
+    }
+
+    .timeline-number {
+        font-size: 20px;
+    }
+
+    .timeline-description {
+        font-size: 12px;
+    }
+}
+
+/* ===========================
+   ACCESSIBILITY
+   =========================== */
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+    .timeline-marker {
+        border-width: 4px;
+    }
+
+    .timeline-content {
+        border: 2px solid #333;
+    }
+
+    .timeline-description {
+        color: #000;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .timeline-spine,
+    .timeline-marker,
+    .timeline-content {
+        transition: none;
+    }
+
+    .timeline-marker.pulse {
+        animation: none;
+    }
+
+    @keyframes pulse-marker {
+        0%,
+        100% {
+            transform: translateX(-50%) scale(1);
+        }
+    }
+}
+
+/* Dark mode preference (optional) */
+@media (prefers-color-scheme: dark) {
+    .timeline-container {
+        background: #1a1a1a;
+    }
+
+    .timeline-spine {
+        background: linear-gradient(to bottom, #ddd, #888);
+    }
+
+    .timeline-marker {
+        background: #ddd;
+        border-color: #1a1a1a;
+    }
+
+    .timeline-content {
+        background: #2a2a2a;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+    }
+
+    .timeline-title,
+    .timeline-number {
+        color: #ddd;
+    }
+
+    .timeline-year {
+        color: #888;
+    }
+
+    .timeline-description {
+        color: #aaa;
+    }
+}
+
+/* ===========================
+   PRINT STYLES
+   =========================== */
+
+@media print {
+    .timeline-container {
+        overflow: visible;
+        height: auto;
+    }
+
+    .timeline-spine {
+        display: none;
+    }
+
+    .timeline-event,
+    .timeline-event.left,
+    .timeline-event.right {
+        page-break-inside: avoid;
+        padding: 0 !important;
+        margin: 20px 0 !important;
+    }
+}

@@ -53,7 +53,7 @@ export default function Home() {
     return (
         <>
             <Seo />
-
+            AQUI
             <Section hero>
                 <div className="home-hero">
                     <div className="home-hero__content">
@@ -62,7 +62,11 @@ export default function Home() {
                             <DecoderText text={"MARC BOREU"} />
                         </h1>
                         <p className="home-hero__lead">
-                            <Text3d text={t("home.lead")} depth={6} maxTilt={4} />
+                            <Text3d
+                                text={t("home.lead")}
+                                depth={6}
+                                maxTilt={4}
+                            />
                         </p>
                         <div className="home-hero__actions">
                             <Button href={urls.projects}>
@@ -78,7 +82,6 @@ export default function Home() {
                     </div>
                 </div>
             </Section>
-
             <Section id="services">
                 <h2>{t("home.services.title")}</h2>
                 <p className="lead">{t("home.services.lead")}</p>
@@ -92,7 +95,6 @@ export default function Home() {
                     ))}
                 </div>
             </Section>
-
             <Section id="skills">
                 <h2>{t("home.skills.title")}</h2>
                 <p className="lead">{t("home.skills.lead")}</p>
@@ -105,7 +107,6 @@ export default function Home() {
                     ))}
                 </ul>
             </Section>
-
             <Section id="featured-projects">
                 <h2>{t("home.featuredProjects.title")}</h2>
                 <p className="lead">{t("home.featuredProjects.lead")}</p>
@@ -114,7 +115,9 @@ export default function Home() {
                     {featuredProjects.map((project) => (
                         <Card key={project.key} className="home-card">
                             <h3>
-                                {t(`home.featuredProjects.items.${project.key}.title`)}
+                                {t(
+                                    `home.featuredProjects.items.${project.key}.title`,
+                                )}
                             </h3>
                             <p>
                                 {t(
@@ -138,7 +141,6 @@ export default function Home() {
                     </Button>
                 </div>
             </Section>
-
             <Section id="experience">
                 <h2>{t("home.experience.title")}</h2>
                 <p className="lead">{t("home.experience.lead")}</p>
@@ -159,7 +161,9 @@ export default function Home() {
                     <Card className="home-card">
                         <h3>{t("home.experience.items.portaventura.title")}</h3>
                         <p>
-                            {t("home.experience.items.portaventura.description")}
+                            {t(
+                                "home.experience.items.portaventura.description",
+                            )}
                         </p>
                     </Card>
                 </div>
@@ -170,15 +174,12 @@ export default function Home() {
                     </Button>
                 </div>
             </Section>
-
             <Section id="contact-cta">
                 <h2>{t("home.cta.title")}</h2>
                 <p className="lead">{t("home.cta.lead")}</p>
 
                 <div className="home-section-actions">
-                    <Button href={urls.contact}>
-                        {t("home.cta.button")}
-                    </Button>
+                    <Button href={urls.contact}>{t("home.cta.button")}</Button>
                 </div>
             </Section>
         </>
